@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { authOperations } from 'redux/auth/auth-operations';
 import { useDispatch } from 'react-redux';
-import toast from 'react-hot-toast';
 
 import css from '../../components/styles.module.css';
 
@@ -34,7 +33,6 @@ const SingUpPage = () => {
     setName('');
     setEmail('');
     setPassword('');
-    toast.success('Successful registration')
   };
 
 return (

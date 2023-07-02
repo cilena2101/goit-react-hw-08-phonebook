@@ -20,7 +20,8 @@ const signup = createAsyncThunk('auth/register', async credentials => {
     console.log(data);
     return data;
   } catch (error) {
-    toast.error('Oops, the user is already registered.');
+    // console.log(error.message);
+    toast.error('Wrong login or password.');
   }
 });
 
@@ -30,7 +31,7 @@ const logIn = createAsyncThunk('auth/login', async credentials => {
     token.set(data.token);
     return data;
   } catch (error) {
-    toast.warn('Incorrect password or username')
+    toast.error('Incorrect password or login');
   }
 });
 
@@ -40,7 +41,7 @@ const logOut = createAsyncThunk('auth/logout', async () => {
     token.unset();
   } catch (error) {
     toast.error('Sorry, an error has occurred');
-    console.log(error.message)
+    // console.log(error.message)
   }
 });
 

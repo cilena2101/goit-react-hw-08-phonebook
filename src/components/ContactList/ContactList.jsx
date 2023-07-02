@@ -1,21 +1,28 @@
-import './ContactList.module.css';
-import { useSelector } from 'react-redux';
-import { getFilter } from '../../redux/filterSlice';
-import {
-  useFetchContactsQuery,
-  useDeleteContactMutation,
-} from '../../redux/contactsSlice';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useContacts } from '../Hooks/hooks';
+import { contactsOperations } from '../../redux/contacts/contacts-operations';
+import authSelectors from 'redux/auth/auth-selectors'; 
+import css from '../styles.module.css';
 import { Loader } from 'components/Loader/Loader';
 
 export const ContactList = () => {
-  const filter = useSelector(getFilter);
-  const { data: contacts, isFetching } = useFetchContactsQuery();
-  const [deleteContact, { isLoading }] = useDeleteContactMutation();
+  const isLoggedIn = useSelector(authSelectors.getIsLoggedIn);
+
+  const dispatch = useDispatch();
+  const { contacts, isLoading, filter, deleteContact, setFilter } =
+    useContacts();
+
+  useEffect(() => {
+    dispatch(contactsOperations.getContacts());
+  }, [dispatch]);
 
   const findContacts = () => {
-     if (contacts) {
+    const normalizedFilter = filter.toLowerCase();
+
+    if (contacts) {
       return contacts.filter(contact =>
-        contact.name.toLowerCase().includes(filter.toLowerCase())
+        contact.name.toLowerCase().includes(normalizedFilter)
       );
     }
   };
@@ -23,25 +30,27 @@ export const ContactList = () => {
   const filteredContacts = findContacts();
 
   return (
-    <div className='listContacts'>
-      {isFetching && <Loader/>}
-      {contacts && (
-        <ul >
-          {filteredContacts.map(({ id, name, phone }) => {
+    <div>
+      {isLoading && <Loader />}
+      {isLoggedIn && (
+        <ul className={css.contact_wrap} >
+          {contacts && filteredContacts.map(({ id, name, number }) => {
             return (
-              <li key={id}>
-                <div className='contact-item'>
-                  <h3>{name}:</h3>
-                  <p>{phone}</p>
+              <li key={id} className={css.contact_item} >
+                <div className={css.contact_item}>
+                  <h3 className={css.contact_name} >{name}:</h3>
+                  <p>{number}</p>
                 </div>
                 <button
                   type="button"
+                  className={css.btn_contact}                 
                   onClick={() => {
                     deleteContact(id);
+                    setFilter('');
                   }}
                 >
-                  {isLoading ? '...' : 'Delete'}
-                </button>            
+                  Delete
+                </button>
               </li>
             );
           })}
